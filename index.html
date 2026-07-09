@@ -239,11 +239,13 @@
 
         function updateTitle1() {
             title1Text = document.getElementById('title1').value;
+            localStorage.setItem('title1', title1Text);
             updateChart1();
         }
 
         function updateTitle2() {
             title2Text = document.getElementById('title2').value;
+            localStorage.setItem('title2', title2Text);
             updateChart2();
         }
 
@@ -260,10 +262,12 @@
                 cannotScoop: cannotScoop
             };
 
+            localStorage.setItem('chartData1', JSON.stringify(data));
             chart1.setOption(getChart1Option(data), true);
         }
 
         function resetData1() {
+            localStorage.removeItem('chartData1');
             document.getElementById('judged').value = defaultData1.judged;
             document.getElementById('pending').value = defaultData1.pending;
             document.getElementById('canScoop').value = defaultData1.canScoop;
@@ -280,17 +284,55 @@
                 liquid: liquid
             };
 
+            localStorage.setItem('chartData2', JSON.stringify(data));
             chart2.setOption(getChart2Option(data), true);
         }
 
         function resetData2() {
+            localStorage.removeItem('chartData2');
             document.getElementById('solid').value = defaultData2.solid;
             document.getElementById('liquid').value = defaultData2.liquid;
             updateChart2();
         }
 
-        chart1.setOption(getChart1Option(defaultData1));
-        chart2.setOption(getChart2Option(defaultData2));
+        function initData() {
+            var savedData1 = localStorage.getItem('chartData1');
+            var savedData2 = localStorage.getItem('chartData2');
+            var savedTitle1 = localStorage.getItem('title1');
+            var savedTitle2 = localStorage.getItem('title2');
+
+            if (savedData1) {
+                var data1 = JSON.parse(savedData1);
+                document.getElementById('judged').value = data1.judged;
+                document.getElementById('pending').value = data1.pending;
+                document.getElementById('canScoop').value = data1.canScoop;
+                document.getElementById('cannotScoop').value = data1.cannotScoop;
+                chart1.setOption(getChart1Option(data1));
+            } else {
+                chart1.setOption(getChart1Option(defaultData1));
+            }
+
+            if (savedData2) {
+                var data2 = JSON.parse(savedData2);
+                document.getElementById('solid').value = data2.solid;
+                document.getElementById('liquid').value = data2.liquid;
+                chart2.setOption(getChart2Option(data2));
+            } else {
+                chart2.setOption(getChart2Option(defaultData2));
+            }
+
+            if (savedTitle1) {
+                document.getElementById('title1').value = savedTitle1;
+                title1Text = savedTitle1;
+            }
+
+            if (savedTitle2) {
+                document.getElementById('title2').value = savedTitle2;
+                title2Text = savedTitle2;
+            }
+        }
+
+        initData();
 
         window.addEventListener('resize', function() {
             chart1.resize();
